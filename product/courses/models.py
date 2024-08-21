@@ -1,4 +1,10 @@
+from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 from django.db import models
+from users.models import Subscription
+
+
+User = get_user_model()
 
 
 class Course(models.Model):
@@ -18,7 +24,17 @@ class Course(models.Model):
         verbose_name='Дата и время начала курса'
     )
 
-    # TODO
+    price = models.IntegerField(
+        verbose_name="Цена",
+        null=False,
+        validators=[MinValueValidator(0)]
+    )
+
+    @property
+    def is_available_for_user(self, user):
+        if isinstance(user, User):
+            return Subscription.objects.filter(user=user, course=self).exists()
+        raise TypeError("user must be an instance of user model")
 
     class Meta:
         verbose_name = 'Курс'
@@ -41,7 +57,13 @@ class Lesson(models.Model):
         verbose_name='Ссылка',
     )
 
-    # TODO
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        null=False,
+        related_name="lessons",
+        verbose_name="Курс",
+    )
 
     class Meta:
         verbose_name = 'Урок'
@@ -55,7 +77,18 @@ class Lesson(models.Model):
 class Group(models.Model):
     """Модель группы."""
 
-    # TODO
+    course = models.ForeignKey(
+        Course,
+        related_name="groups",
+        verbose_name="Курс",
+        on_delete=models.CASCADE,
+        null=False
+    )
+    students = models.ManyToManyField(
+        User,
+        related_name='course_groups',
+        verbose_name="Студенты"
+    )
 
     class Meta:
         verbose_name = 'Группа'
