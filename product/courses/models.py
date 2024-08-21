@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MinLengthValidator
 from django.db import models
 from users.models import Subscription
 
@@ -77,6 +77,12 @@ class Lesson(models.Model):
 class Group(models.Model):
     """Модель группы."""
 
+    title = models.CharField(
+        max_length=250,
+        null=False,
+        validators=[MinLengthValidator(1)],
+        verbose_name="Название группы"
+    )
     course = models.ForeignKey(
         Course,
         related_name="groups",

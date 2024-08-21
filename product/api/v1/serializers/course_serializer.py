@@ -48,10 +48,13 @@ class StudentSerializer(serializers.ModelSerializer):
 
 class GroupSerializer(serializers.ModelSerializer):
     """Список групп."""
+    course_name = serializers.SerializerMethodField(read_only=True)
 
-    # TODO Доп. задание
+    def get_course_name(self, obj):
+        return self.course.name
 
     class Meta:
+        fields = ("title", "course_name", "students")
         model = Group
 
 
@@ -129,6 +132,12 @@ class CreateCourseSerializer(serializers.ModelSerializer):
     """Создание курсов."""
 
     class Meta:
+        fields = (
+            'id',
+            'author',
+            'title',
+            'start_date',
+            'price',)
         model = Course
 
 

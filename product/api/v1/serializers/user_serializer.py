@@ -11,6 +11,7 @@ class CustomUserSerializer(UserSerializer):
     """Сериализатор пользователей."""
 
     class Meta:
+        fields = ('id', 'first_name', 'last_name', 'email',)
         model = User
 
 
