@@ -9,9 +9,13 @@ User = get_user_model()
 
 class CustomUserSerializer(UserSerializer):
     """Сериализатор пользователей."""
+    balance = serializers.SerializerMethodField(read_only=True)
+
+    def get_balance(self, obj) -> int:
+        return obj.balance.balance
 
     class Meta:
-        fields = ('id', 'first_name', 'last_name', 'email',)
+        fields = ('id', 'first_name', 'last_name', 'email', 'balance',)
         model = User
 
 
