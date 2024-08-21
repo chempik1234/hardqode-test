@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Q
 from rest_framework import serializers
 
 from courses.models import Course, Group, Lesson
@@ -91,15 +91,23 @@ class CourseSerializer(serializers.ModelSerializer):
 
     def get_students_count(self, obj):
         """Общее количество студентов на курсе."""
-        # TODO Доп. задание
+        return Subscription.objects.filter(course=obj).count()  # не считать сумму студентов групп, сложить подписки
 
     def get_groups_filled_percent(self, obj):
         """Процент заполнения групп, если в группе максимум 30 чел.."""
-        # TODO Доп. задание
+        # вычислим сначала среднее количество студентов, а потом уже для него - процент заполненности
+        percentage = (Group.objects.filter(course=obj)
+                      .annotate(num_students=Count('students'))
+                      .aggregate(Avg("num_students"))) / 30 * 100
+        return round(percentage, 2)
 
     def get_demand_course_percent(self, obj):
         """Процент приобретения курса."""
-        # TODO Доп. задание
+        user_count = User.objects.all().count()
+        if user_count == 0:
+            return 0
+        percentage = Subscription.objects.filter(course=obj).count() / user_count * 100
+        return round(percentage, 2)
 
     class Meta:
         model = Course
