@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import permissions, viewsets
 
-from users.modeks import Balance
+from users.models import Balance
 
 from api.v1.serializers.user_serializer import CustomUserSerializer
 
